@@ -90,10 +90,58 @@ This is a **training example, not production-ready authentication software**.
 - The built-in HTTP server is intended for local experimentation only.
 - Keep the server bound to `127.0.0.1`; do not deploy it directly to the internet or use real credentials.
 
+## Defensive toolkit
+
+`toolkit.py` adds three local defensive utilities:
+
+### 1. Password policy check
+
+```bash
+python3 toolkit.py password-policy
+```
+
+Prompts securely without echoing the password, then reports basic length and character-category checks. It does not save or transmit the password. This is a simple policy check, not a password-strength or crack-time guarantee.
+
+### 2. Local HTTP security-header review
+
+Start the lab in one terminal:
+
+```bash
+python3 app.py
+```
+
+In another terminal:
+
+```bash
+python3 toolkit.py headers http://127.0.0.1:8080/
+```
+
+The check is restricted to explicit loopback hosts (`localhost`, `127.0.0.1`, and `::1`). It reports common security headers and missing items for review. It does not scan external hosts. A missing header is not automatically a vulnerability; for example, HSTS is relevant when serving HTTPS.
+
+### 3. Audit-log summary
+
+Save an exported JSON array of audit records to a local file, then run:
+
+```bash
+python3 toolkit.py audit-summary audit.json
+```
+
+The command summarizes event counts and the number of distinct usernames. It reads the file without modifying it. The lab's `/audit` endpoint returns JSON; copy its output to a local file if you want to summarize it.
+
+## Run all tests
+
+```bash
+python3 -m unittest -v
+```
+
+This runs both the authentication application tests and toolkit tests.
+
 ## Project files
 
 - `app.py` — local HTTP application and authentication logic
-- `test_app.py` — unit tests
+- `test_app.py` — authentication unit tests
+- `toolkit.py` — defensive local toolkit (password policy, local headers, audit summary)
+- `test_toolkit.py` — toolkit unit tests
 - `LICENSE` — MIT License
 
 ## License
